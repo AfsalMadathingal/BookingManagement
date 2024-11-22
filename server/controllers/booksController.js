@@ -1,11 +1,35 @@
 import Book from '../models/Book.js';
 import elasticsearchClient from '../utils/elasticsearchClient.js';
+// import cloudinary from '../utils/cloudinary.js';
+import { v2 as cloudinary } from 'cloudinary';
 import fs from 'fs';
 
-// Create a new book
+
+
 export const createBook = async (req, res) => {
   try {
-    req.body.coverPhoto = process.env.BASE_URL + '/uploads/' + req.file.filename;
+
+    cloudinary.config({
+      cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+      api_key: process.env.CLOUDINARY_API_KEY,
+      api_secret: process.env.CLOUDINARY_API_SECRET,
+    });
+
+    // Upload image to Cloudinary
+    const result = await cloudinary.uploader.upload(req.file.path, {
+      folder: 'books', // Optional: specify a folder in Cloudinary
+      public_id: `${req.body.title}-${Date.now()}`, // Unique identifier for the image
+      resource_type: 'image',
+      use_filename: true,
+      unique_filename: true
+    });
+
+    fs.unlink(req.file.path, (err) => {
+      if (err) console.error('Failed to delete local file:', err);
+    });
+
+    // Add Cloudinary URL to the book's cover photo
+    req.body.coverPhoto = result.secure_url;
 
     // Save to MongoDB
     const book = new Book(req.body);
@@ -25,10 +49,11 @@ export const createBook = async (req, res) => {
 
     res.status(201).json(book);
   } catch (err) {
-    console.error(err);
+    console.log(err);
     res.status(500).json({ error: err.message });
   }
 };
+
 
 // Get all books
 export const getAllBooks = async (req, res) => {
@@ -85,14 +110,14 @@ export const deleteBookById = async (req, res) => {
       index: 'books',
       id: req.params.id,
     });
-
     const { coverPhoto } = book;
     if (coverPhoto) {
-      const filePath = coverPhoto.split('uploads/')[1];
-      const imagePath = './uploads/' + filePath;
-      fs.unlink(imagePath, (err) => {
-        if (err) {
-          console.error(err);
+      const publicId = `books/`+coverPhoto.split('/').pop().split('.')[0];
+      cloudinary.uploader.destroy(publicId, (error, result) => {
+        if (error) {
+          console.log(error);
+        } else {
+          console.log("Deleted from Cloudinary:", result);
         }
       });
     }
