@@ -1,8 +1,6 @@
-// server.js
 import dotenv from 'dotenv';
 dotenv.config();
 import express from 'express';
-import mongoose from 'mongoose';
 import bodyParser from 'body-parser';
 import bookRoutes from './routes/bookRoutes.js';
 import morgan from 'morgan';
@@ -10,7 +8,7 @@ import cors from 'cors'
 import errorHandler from './middleware/errorHandler.js';
 import { connectDB } from './config/db.js';
 import setupElasticsearch from './utils/setupElasticsearch.js';
- 
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 app.use(cors())
