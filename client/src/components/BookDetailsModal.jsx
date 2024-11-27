@@ -30,10 +30,12 @@ const BookDetailsModal = ({ isOpen, onClose, book }) => {
     
         await deleteBook(id);
         
-        onClose();
+        
         toast.success("Book deleted successfully");
+        onClose()
         
     } catch (error) {
+      toast.error("something went wrong")
         console.error(error)
         throw error
     }
