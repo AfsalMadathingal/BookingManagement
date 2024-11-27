@@ -1,7 +1,6 @@
 import Book from '../models/Book.js';
 import elasticsearchClient from '../utils/elasticsearchClient.js';
-import cloudinary from '../utils/cloudinary.js';
-// import { v2 as cloudinary } from 'cloudinary';
+import cloudinary from '../utils/cloudinaryCofig.js';
 import fs from 'fs';
 
 
@@ -9,11 +8,6 @@ import fs from 'fs';
 export const createBook = async (req, res) => {
   try {
 
-    // cloudinary.config({
-    //   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-    //   api_key: process.env.CLOUDINARY_API_KEY,
-    //   api_secret: process.env.CLOUDINARY_API_SECRET,
-    // });
 
     // Upload image to Cloudinary
     const result = await cloudinary.uploader.upload(req.file.path, {
