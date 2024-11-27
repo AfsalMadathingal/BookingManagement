@@ -1,6 +1,6 @@
 import Book from '../models/Book.js';
 import elasticsearchClient from '../utils/elasticsearchClient.js';
-import cloudinary from '../utils/cloudinaryCofig.js';
+import cloudinary from '../utils/cloudinaryConfig.js';
 import fs from 'fs';
 
 
